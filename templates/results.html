@@ -23,7 +23,7 @@
                     type="text" 
                     name="query" 
                     value="{{ query }}"
-                    class="w-full pl-10 pr-4 py-2 bg-darker-bg border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red text-white"
+                    class="w-full pl-10 pr-4 py-2 bg-darker-bg border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red text-gray-700"
                     required
                 >
             </div>
@@ -73,25 +73,9 @@
                     <i class="fas fa-play mr-2"></i> Watch
                 </a>
                 <div class="relative group">
-                    <button class="download-options-btn flex items-center justify-center btn-youtube px-4 py-2 rounded">
+                    <button class="download-btn flex items-center justify-center btn-youtube px-4 py-2 rounded">
                         <i class="fas fa-download mr-2"></i> Download
                     </button>
-                    <div class="download-options hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-darker-bg ring-1 ring-black ring-opacity-5 z-10">
-                        <div class="py-1">
-                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="best">
-                                Best Quality (MP4)
-                            </a>
-                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="720">
-                                720p (MP4)
-                            </a>
-                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="360">
-                                360p (MP4)
-                            </a>
-                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="audio">
-                                Audio Only (MP3)
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -162,37 +146,19 @@
                 // Set watch button
                 const watchBtn = videoCard.querySelector('.watch-btn');
                 watchBtn.href = `/watch/${video.id}`;
-                
-                // Set download options button
-                const downloadOptionsBtn = videoCard.querySelector('.download-options-btn');
-                const downloadOptions = videoCard.querySelector('.download-options');
-                
-                downloadOptionsBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    downloadOptions.classList.toggle('hidden');
-                });
-                
+
                 // Set download links
-                const downloadBtns = videoCard.querySelectorAll('.download-video-btn');
-                downloadBtns.forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const quality = this.getAttribute('data-quality');
-                        window.location.href = `/download/${video.id}?quality=${quality}`;
-                    });
-                });
+                const downloadBtn = videoCard.querySelector('.download-btn');
+                downloadBtn.href = `/download/${video.id}?quality=best`;
+                
+                
+                // Set download links directly (like in watch.html)
+                videoCard.querySelector('.download-best').href = `/download/${video.id}?quality=best`;
+                videoCard.querySelector('.download-720').href = `/download/${video.id}?quality=720`;
+                videoCard.querySelector('.download-360').href = `/download/${video.id}?quality=360`;
+                videoCard.querySelector('.download-audio').href = `/download/${video.id}?quality=audio`;
                 
                 videoGrid.appendChild(videoCard);
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                const dropdowns = document.querySelectorAll('.download-options');
-                dropdowns.forEach(dropdown => {
-                    if (!dropdown.parentElement.contains(e.target)) {
-                        dropdown.classList.add('hidden');
-                    }
-                });
             });
         }
         
