@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - {{ query }}{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold">Results for: <span class="youtube-red">{{ query }}</span></h1>
+        <div>
+            <a href="/" class="text-secondary-text hover:text-white flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> New Search
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-light-bg rounded-lg p-4 md:p-6">
+        <form action="/search" method="POST" class="flex flex-col md:flex-row gap-3">
+            <div class="flex-grow relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-500"></i>
+                </div>
+                <input 
+                    type="text" 
+                    name="query" 
+                    value="{{ query }}"
+                    class="w-full pl-10 pr-4 py-2 bg-darker-bg border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red text-white"
+                    required
+                >
+            </div>
+            <button type="submit" class="btn-youtube px-4 py-2 rounded-lg font-medium">
+                <i class="fas fa-search mr-2"></i> Search
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="loading" class="flex flex-col items-center justify-center py-12">
+    <div class="loader h-12 w-12 rounded-full border-4 border-gray-600"></div>
+    <p class="mt-4 text-xl">Fetching videos...</p>
+</div>
+
+<div id="error-message" class="hidden bg-red-900 text-white p-6 rounded-lg mb-8">
+    <h3 class="text-xl font-bold mb-2">Error</h3>
+    <p id="error-text"></p>
+</div>
+
+<div id="results-container" class="hidden">
+    <div id="video-count" class="mb-4 text-secondary-text"></div>
+    
+    <div id="video-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Videos will be dynamically inserted here -->
+    </div>
+    
+    <div id="no-results" class="hidden py-12 text-center">
+        <i class="fas fa-search text-4xl youtube-red mb-4"></i>
+        <h3 class="text-2xl font-bold mb-2">No videos found</h3>
+        <p class="text-secondary-text">Try a different search term or URL</p>
+    </div>
+</div>
+
+<!-- Video card template -->
+<template id="video-card-template">
+    <div class="card rounded-lg overflow-hidden shadow-lg">
+        <div class="relative">
+            <img class="video-thumbnail w-full h-48 object-cover" src="" alt="">
+            <span class="video-duration absolute bottom-2 right-2 bg-black bg-opacity-80 text-white text-sm px-2 py-1 rounded"></span>
+        </div>
+        <div class="p-4">
+            <h3 class="video-title font-semibold text-lg mb-2 line-clamp-2 h-14"></h3>
+            <div class="video-channel text-secondary-text mb-4 text-sm"></div>
+            <div class="flex justify-between">
+                <a href="#" class="watch-btn flex items-center justify-center bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors">
+                    <i class="fas fa-play mr-2"></i> Watch
+                </a>
+                <div class="relative group">
+                    <button class="download-options-btn flex items-center justify-center btn-youtube px-4 py-2 rounded">
+                        <i class="fas fa-download mr-2"></i> Download
+                    </button>
+                    <div class="download-options hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-darker-bg ring-1 ring-black ring-opacity-5 z-10">
+                        <div class="py-1">
+                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="best">
+                                Best Quality (MP4)
+                            </a>
+                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="720">
+                                720p (MP4)
+                            </a>
+                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="360">
+                                360p (MP4)
+                            </a>
+                            <a href="#" class="download-video-btn block px-4 py-2 text-sm hover:bg-light-bg" data-quality="audio">
+                                Audio Only (MP3)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const query = '{{ query }}';
+        const loadingElement = document.getElementById('loading');
+        const resultsContainer = document.getElementById('results-container');
+        const videoGrid = document.getElementById('video-grid');
+        const videoCount = document.getElementById('video-count');
+        const noResults = document.getElementById('no-results');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const videoCardTemplate = document.getElementById('video-card-template');
+        
+        // Function to fetch videos
+        async function fetchVideos() {
+            try {
+                const response = await fetch(`/api/videos?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayVideos(data);
+                } else {
+                    showError(data.error || 'An error occurred while fetching videos');
+                }
+            } catch (error) {
+                showError('Network error. Please try again later.');
+            } finally {
+                loadingElement.classList.add('hidden');
+            }
+        }
+        
+        // Function to display videos
+        function displayVideos(videos) {
+            resultsContainer.classList.remove('hidden');
+            
+            if (videos.length === 0) {
+                noResults.classList.remove('hidden');
+                videoCount.textContent = 'No videos found';
+                return;
+            }
+            
+            videoCount.textContent = `${videos.length} video${videos.length === 1 ? '' : 's'} found`;
+            
+            videos.forEach(video => {
+                const videoCard = videoCardTemplate.content.cloneNode(true);
+                
+                // Set video data
+                videoCard.querySelector('.video-thumbnail').src = video.thumbnail;
+                videoCard.querySelector('.video-thumbnail').alt = video.title;
+                videoCard.querySelector('.video-duration').textContent = video.duration;
+                videoCard.querySelector('.video-title').textContent = video.title;
+                
+                // Set channel info if available
+                if (video.channel) {
+                    videoCard.querySelector('.video-channel').textContent = video.channel;
+                } else {
+                    videoCard.querySelector('.video-channel').classList.add('hidden');
+                }
+                
+                // Set watch button
+                const watchBtn = videoCard.querySelector('.watch-btn');
+                watchBtn.href = `/watch/${video.id}`;
+                
+                // Set download options button
+                const downloadOptionsBtn = videoCard.querySelector('.download-options-btn');
+                const downloadOptions = videoCard.querySelector('.download-options');
+                
+                downloadOptionsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    downloadOptions.classList.toggle('hidden');
+                });
+                
+                // Set download links
+                const downloadBtns = videoCard.querySelectorAll('.download-video-btn');
+                downloadBtns.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const quality = this.getAttribute('data-quality');
+                        window.location.href = `/download/${video.id}?quality=${quality}`;
+                    });
+                });
+                
+                videoGrid.appendChild(videoCard);
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                const dropdowns = document.querySelectorAll('.download-options');
+                dropdowns.forEach(dropdown => {
+                    if (!dropdown.parentElement.contains(e.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
+            });
+        }
+        
+        // Function to show error message
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+        
+        // Fetch videos when page loads
+        fetchVideos();
+    });
+</script>
+{% endblock %}

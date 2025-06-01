@@ -1,0 +1,4 @@
+Flask==2.2.3
+yt-dlp==2023.3.4
+python-dotenv==1.0.0
+Flask-Caching==2.0.2

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}YouTube Downloader - Search and Download{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold mb-4">YouTube Video Downloader</h1>
+        <p class="text-xl text-secondary-text">Search for videos or enter a YouTube URL to download your favorite content</p>
+    </div>
+
+    <div class="bg-light-bg rounded-lg shadow-lg p-8 mb-8">
+        <form action="/search" method="POST" class="mb-4">
+            <div class="flex flex-col md:flex-row md:items-center gap-4">
+                <div class="flex-grow relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-500"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        name="query" 
+                        id="search-input"
+                        placeholder="Enter YouTube URL or search term..." 
+                        class="w-full pl-10 pr-4 py-3 bg-darker-bg border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-youtube-red text-white"
+                        required
+                    >
+                </div>
+                <button type="submit" class="btn-youtube px-6 py-3 rounded-lg font-medium flex items-center justify-center">
+                    <i class="fas fa-search mr-2"></i> Search
+                </button>
+            </div>
+            {% if error %}
+            <div class="mt-4 text-red-500">
+                <p>{{ error }}</p>
+            </div>
+            {% endif %}
+        </form>
+
+        <div class="mt-6 text-secondary-text">
+            <h3 class="font-semibold mb-2">You can enter:</h3>
+            <ul class="list-disc list-inside space-y-2">
+                <li>YouTube video URL (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)</li>
+                <li>YouTube playlist URL (e.g., https://www.youtube.com/playlist?list=PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI)</li>
+                <li>Search terms (e.g., "Rick Astley Never Gonna Give You Up")</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="bg-light-bg rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold mb-4">How It Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center p-4">
+                <div class="text-4xl mb-4 youtube-red">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Search</h3>
+                <p class="text-secondary-text">Enter a YouTube URL or search for videos using keywords</p>
+            </div>
+            <div class="text-center p-4">
+                <div class="text-4xl mb-4 youtube-red">
+                    <i class="fas fa-list"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Browse</h3>
+                <p class="text-secondary-text">Browse through search results with video thumbnails and details</p>
+            </div>
+            <div class="text-center p-4">
+                <div class="text-4xl mb-4 youtube-red">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Download</h3>
+                <p class="text-secondary-text">Download videos in various formats and quality options</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

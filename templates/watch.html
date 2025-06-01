@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Watch Video{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <div class="mb-6">
+        <a href="javascript:history.back()" class="text-secondary-text hover:text-white flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Results
+        </a>
+    </div>
+
+    <div class="bg-light-bg rounded-lg shadow-lg overflow-hidden">
+        <div class="aspect-w-16 aspect-h-9">
+            <iframe 
+                src="https://www.youtube.com/embed/{{ video_id }}" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen
+                class="w-full h-full"
+                style="min-height: 480px;"
+            ></iframe>
+        </div>
+        
+        <div class="p-6">
+            <div id="video-info" class="animate-pulse">
+                <div class="h-8 bg-gray-700 rounded w-3/4 mb-4"></div>
+                <div class="h-4 bg-gray-700 rounded w-1/2 mb-2"></div>
+                <div class="h-4 bg-gray-700 rounded w-1/4"></div>
+            </div>
+            
+            <div class="mt-6 flex flex-col sm:flex-row gap-4">
+                <a href="/download/{{ video_id }}?quality=best" class="btn-youtube px-6 py-3 rounded-lg font-medium flex items-center justify-center">
+                    <i class="fas fa-download mr-2"></i> Download Video
+                </a>
+                <a href="/download/{{ video_id }}?quality=audio" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-medium flex items-center justify-center transition-colors">
+                    <i class="fas fa-music mr-2"></i> Download Audio
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const videoId = '{{ video_id }}';
+        const videoInfoElement = document.getElementById('video-info');
+        
+        // Fetch video details
+        async function fetchVideoDetails() {
+            try {
+                const response = await fetch(`/api/videos?query=https://www.youtube.com/watch?v=${videoId}`);
+                const data = await response.json();
+                
+                if (response.ok && data.length > 0) {
+                    const video = data[0];
+                    
+                    // Replace loading skeleton with actual info
+                    videoInfoElement.innerHTML = `
+                        <h1 class="text-2xl font-bold mb-2">${video.title}</h1>
+                        <div class="flex items-center text-secondary-text">
+                            <span class="mr-4">${video.channel || 'Unknown channel'}</span>
+                            ${video.view_count ? `<span><i class="fas fa-eye mr-1"></i> ${formatViewCount(video.view_count)}</span>` : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to fetch video details:', error);
+            }
+        }
+        
+        // Format view count with commas
+        function formatViewCount(count) {
+            if (!count) return '0 views';
+            
+            if (count >= 1000000) {
+                return Math.floor(count / 1000000) + 'M views';
+            } else if (count >= 1000) {
+                return Math.floor(count / 1000) + 'K views';
+            } else {
+                return count + ' views';
+            }
+        }
+        
+        fetchVideoDetails();
+    });
+</script>
+{% endblock %}

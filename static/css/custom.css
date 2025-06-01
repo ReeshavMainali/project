@@ -1,0 +1,55 @@
+/* Additional custom styles beyond Tailwind */
+
+/* Custom animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Custom scrollbar for Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #555 var(--darker-bg);
+}
+
+/* Video card hover effects */
+.video-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+/* Download button pulse animation */
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Improved focus styles */
+a:focus, button:focus, input:focus {
+    outline: 2px solid var(--youtube-red);
+    outline-offset: 2px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+    .video-title {
+        font-size: 0.95rem;
+    }
+    
+    .video-thumbnail {
+        height: 180px;
+    }
+}

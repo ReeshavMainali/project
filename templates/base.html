@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}YouTube Downloader{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --youtube-red: #FF0000;
+            --dark-bg: #212121;
+            --darker-bg: #181818;
+            --light-bg: #303030;
+            --text-color: #FFFFFF;
+            --secondary-text: #AAAAAA;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .youtube-red {
+            color: var(--youtube-red);
+        }
+        
+        .bg-youtube-red {
+            background-color: var(--youtube-red);
+        }
+        
+        .card {
+            background-color: var(--light-bg);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-youtube {
+            background-color: var(--youtube-red);
+            color: white;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-youtube:hover {
+            background-color: #CC0000;
+        }
+        
+        .loader {
+            border-top-color: var(--youtube-red);
+            animation: spinner 0.8s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--darker-bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+        
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <header class="bg-darker-bg shadow-md">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="flex items-center">
+                <i class="fab fa-youtube text-3xl youtube-red mr-2"></i>
+                <span class="text-xl font-bold">YouTube Downloader</span>
+            </a>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="/" class="hover:text-youtube-red transition-colors">Home</a></li>
+                    <li><a href="https://github.com/yourusername/youtube-downloader" class="hover:text-youtube-red transition-colors">GitHub</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-darker-bg py-6 mt-12">
+        <div class="container mx-auto px-4 text-center text-secondary-text">
+            <p>YouTube Downloader &copy; 2025. Created for educational purposes.</p>
+            <p class="mt-2 text-sm">This application uses yt-dlp to fetch video metadata and download videos.</p>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>
